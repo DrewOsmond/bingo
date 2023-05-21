@@ -1,0 +1,10 @@
+{
+  "name": "bingo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Drew Osmond <drewosmond@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^5.0.4"
+  }
+}
