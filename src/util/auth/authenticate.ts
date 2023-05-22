@@ -5,7 +5,7 @@ import { db } from "../..";
 
 export const authorize: MiddlewareFn<Context> = async ({ context }, next) => {
   const session = context.token;
-  console.log(session);
+
   if (!session) {
     throw new Error("not authorized");
   }

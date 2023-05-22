@@ -25,7 +25,7 @@ export const signJwt = (res: Response, user: User) => {
     signed: true,
     secure: inProduction,
   });
-  console.log(token, "TOKEN");
+
   return token;
 };
 export const verifyJwt = (
@@ -33,7 +33,6 @@ export const verifyJwt = (
 ): Promise<JwtPayloadValue | undefined> =>
   new Promise((resolve) => {
     jwt.verify(token, SECRET, {}, (_err, payload) => {
-      console.log(token, payload);
       const jwtPaylod = payload as JwtPayloadValue;
       return resolve(jwtPaylod);
     });

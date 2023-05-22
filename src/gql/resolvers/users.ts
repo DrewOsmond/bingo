@@ -31,7 +31,7 @@ class UserResolver {
     if (!ctx.user) {
       return { error: "not logged in" };
     }
-    console.log(ctx.user, "RETURNING USER");
+
     return { user: ctx.user, error: "" };
   }
 
@@ -92,7 +92,6 @@ class UserResolver {
     newPassword: string,
     @Ctx() ctx: Context
   ) {
-    console.log(ctx.user);
     if (!ctx.user) {
       return { error: "Not authorized" };
     }
