@@ -46,8 +46,10 @@ class UserResolver {
       const newUser = new User();
       newUser.username = username.toLowerCase();
       newUser.password = hashedPassword;
+
       await newUser.save();
       signJwt(ctx.res, newUser);
+
       return { user: newUser };
     } catch (e) {
       const error = e as { code: string | number; line: string };
@@ -81,6 +83,7 @@ class UserResolver {
     return { error: "Invalid email or password" };
   }
 
+  @UseMiddleware(authorize)
   @Mutation(() => UserResponse)
   async changePassword(
     @Arg("verifyPassword")
@@ -89,6 +92,7 @@ class UserResolver {
     newPassword: string,
     @Ctx() ctx: Context
   ) {
+    console.log(ctx.user);
     if (!ctx.user) {
       return { error: "Not authorized" };
     }
@@ -104,6 +108,7 @@ class UserResolver {
     }
     const newPasswordHash = await argon2.hash(newPassword);
     user.password = newPasswordHash;
+    user.passwordChangedAt = new Date();
     try {
       await user.save();
 

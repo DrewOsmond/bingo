@@ -5,6 +5,7 @@ import { db } from "../..";
 
 export const authorize: MiddlewareFn<Context> = async ({ context }, next) => {
   const session = context.token;
+  console.log(session);
   if (!session) {
     throw new Error("not authorized");
   }
@@ -16,10 +17,14 @@ export const authorize: MiddlewareFn<Context> = async ({ context }, next) => {
     throw new Error("not authorized");
   }
 
-  if (user.passwordChangedAt && session.issuedOn < user.passwordChangedAt) {
+  if (
+    user.passwordChangedAt &&
+    new Date(session.issuedOn) < user.passwordChangedAt
+  ) {
     context.res.clearCookie("bearer");
     throw new Error("not authorized");
   }
+
   context.user = user;
   return next();
 };
