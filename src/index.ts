@@ -21,7 +21,7 @@ if (!dbport || !username || !database) {
   throw new Error("Database environment is not setup");
 }
 
-export const AppDataSource = new DataSource({
+export const db = new DataSource({
   username: username,
   password: password,
   database: database,
@@ -35,7 +35,7 @@ export const AppDataSource = new DataSource({
   synchronize: true,
 });
 
-AppDataSource.initialize()
+db.initialize()
   .then(() => {
     console.log("Data Source has been initialized successfully.");
   })

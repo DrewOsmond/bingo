@@ -10,10 +10,7 @@ import {
 } from "type-graphql";
 import { User } from "../../entity/user";
 import argon2 from "argon2";
-//   import prisma from "../../../util/context";
-//   import { User } from "../../models";
-// improt {User } from "."
-//   import { isUniqueEmail } from "../../../util/validation/users";
+import { db } from "../..";
 import { Context } from "../../types";
 import { signJwt } from "../../util/auth/token";
 import { authorize } from "../../util/auth/authenticate";
@@ -26,30 +23,8 @@ class UserResponse {
   user?: User;
 }
 
-// @ObjectType()
-// class Error {
-//   @Field(() => String, { nullable: true })
-//   error!: string | null;
-// }
-
-// @ObjectType()
-// class isUnique {
-//   @Field(() => Boolean, { nullable: true })
-//   unique!: boolean;
-//   @Field(() => String, { nullable: true })
-//   error!: string;
-// }
-
 @Resolver(User)
 class UserResolver {
-  //   @Query(() => isUnique)
-  //   async uniqueEmail(@Arg("email") email: string) {
-  //     const emailInUse = await isUniqueEmail(email);
-  //     if (emailInUse) {
-  //       return { error: "email already in use" };
-  //     }
-  //     return { base: true };
-  //   }
   @UseMiddleware(authorize)
   @Query(() => UserResponse)
   async getMe(@Ctx() ctx: Context) {
@@ -84,54 +59,59 @@ class UserResolver {
       return { error: errorMsg };
     }
   }
-  //   @Mutation(() => UserResponse)
-  //   async login(
-  //     @Arg("email") email: string,
-  //     @Arg("password") password: string,
-  //     @Ctx() ctx: Context
-  //   ) {
-  //     const user = await prisma.users.findUnique({ where: { email } });
-  //     if (!user) {
-  //       return { error: "Invalid email or password" };
-  //     }
-  //     const matchedPassword = await argon2.verify(user.password, password);
-  //     if (matchedPassword) {
-  //       signJwt(ctx.res, user);
-  //       return { user };
-  //     }
-  //     return { error: "Invalid email or password" };
-  //   }
-  //   @Mutation(() => Error)
-  //   async changePassword(
-  //     @Arg("verifyPassword")
-  //     verifyPassword: string,
-  //     @Arg("newPassword")
-  //     newPassword: string,
-  //     @Ctx() ctx: Context
-  //   ) {
-  //     if (!ctx.user) {
-  //       return { error: "Not authorized" };
-  //     }
-  //     const user = await prisma.users.findUnique({
-  //       where: { id: ctx.user.id },
-  //     });
-  //     if (!user) {
-  //       return { error: "not a valid user" };
-  //     }
-  //     const matchedPassword = await argon2.verify(user.password, verifyPassword);
-  //     if (!matchedPassword) {
-  //       return { error: "password does not match current password" };
-  //     }
-  //     const newPasswordHash = await argon2.hash(newPassword);
-  //     await prisma.users.update({
-  //       where: { id: ctx.user.id },
-  //       data: {
-  //         password: newPasswordHash,
-  //         passwordChangedAt: new Date(),
-  //       },
-  //     });
-  //     return { error: null };
-  //   }
+
+  @Mutation(() => UserResponse)
+  async login(
+    @Arg("username") username: string,
+    @Arg("password") password: string,
+    @Ctx() ctx: Context
+  ) {
+    const user = await db.getRepository(User).findOneBy({
+      username: username,
+    });
+
+    if (!user) {
+      return { error: "Invalid email or password" };
+    }
+    const matchedPassword = await argon2.verify(user.password, password);
+    if (matchedPassword) {
+      signJwt(ctx.res, user);
+      return { user };
+    }
+    return { error: "Invalid email or password" };
+  }
+
+  @Mutation(() => UserResponse)
+  async changePassword(
+    @Arg("verifyPassword")
+    verifyPassword: string,
+    @Arg("newPassword")
+    newPassword: string,
+    @Ctx() ctx: Context
+  ) {
+    if (!ctx.user) {
+      return { error: "Not authorized" };
+    }
+    const user = await db.getRepository(User).findOneBy({
+      id: ctx.user.id,
+    });
+    if (!user) {
+      return { error: "not a valid user" };
+    }
+    const matchedPassword = await argon2.verify(user.password, verifyPassword);
+    if (!matchedPassword) {
+      return { error: "password does not match current password" };
+    }
+    const newPasswordHash = await argon2.hash(newPassword);
+    user.password = newPasswordHash;
+    try {
+      await user.save();
+
+      return { user };
+    } catch (e) {
+      return { error: e };
+    }
+  }
 }
 
 export default UserResolver;
