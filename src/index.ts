@@ -15,9 +15,7 @@ const username = process.env.DBUSERNAME;
 const password = process.env.DBPASSWORD || "";
 const database = process.env.DATABASE;
 
-console.log(dbport, username, database);
 if (!dbport || !username || !database) {
-  console.log(dbport, username, database);
   throw new Error("Database environment is not setup");
 }
 
