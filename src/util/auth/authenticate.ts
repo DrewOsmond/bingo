@@ -1,7 +1,6 @@
 import { MiddlewareFn } from "type-graphql";
 import { Context } from "../../types";
-import { User } from "../../entity/user";
-import { db } from "../..";
+import { db } from "../../db";
 
 export const authorize: MiddlewareFn<Context> = async ({ context }, next) => {
   const session = context.token;
@@ -9,7 +8,7 @@ export const authorize: MiddlewareFn<Context> = async ({ context }, next) => {
   if (!session) {
     throw new Error("not authorized");
   }
-  const user = await db.getRepository(User).findOneBy({
+  const user = await db.users.findOneBy({
     id: session.id,
   });
 

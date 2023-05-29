@@ -10,7 +10,7 @@ import {
 } from "type-graphql";
 import { User } from "../../entity/user";
 import argon2 from "argon2";
-import { db } from "../..";
+import { db } from "../../db";
 import { Context } from "../../types";
 import { signJwt } from "../../util/auth/token";
 import { authorize } from "../../util/auth/authenticate";
@@ -24,7 +24,7 @@ class UserResponse {
 }
 
 @Resolver(User)
-class UserResolver {
+export default class UserResolver {
   @UseMiddleware(authorize)
   @Query(() => UserResponse)
   async getMe(@Ctx() ctx: Context) {
@@ -43,9 +43,10 @@ class UserResolver {
   ) {
     const hashedPassword = await argon2.hash(password);
     try {
-      const newUser = new User();
-      newUser.username = username.toLowerCase();
-      newUser.password = hashedPassword;
+      const newUser = new User({
+        username: username.toLowerCase(),
+        password: hashedPassword,
+      });
 
       await newUser.save();
       signJwt(ctx.res, newUser);
@@ -68,7 +69,7 @@ class UserResolver {
     @Arg("password") password: string,
     @Ctx() ctx: Context
   ) {
-    const user = await db.getRepository(User).findOneBy({
+    const user = await db.users.findOneBy({
       username: username,
     });
 
@@ -95,7 +96,7 @@ class UserResolver {
     if (!ctx.user) {
       return { error: "Not authorized" };
     }
-    const user = await db.getRepository(User).findOneBy({
+    const user = await db.users.findOneBy({
       id: ctx.user.id,
     });
     if (!user) {
@@ -117,5 +118,3 @@ class UserResolver {
     }
   }
 }
-
-export default UserResolver;

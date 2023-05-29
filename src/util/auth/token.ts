@@ -17,7 +17,7 @@ export const signJwt = (res: Response, user: User) => {
   const token = jwt.sign({ id: user.id, issuedOn: new Date() }, SECRET, {
     expiresIn: 60 * 60 * 24 * 365 * 1000,
   });
-
+  console.log(token);
   res.cookie("bearer", token, {
     maxAge: 60 * 60 * 24 * 365 * 1000,
     httpOnly: inProduction,

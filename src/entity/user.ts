@@ -6,8 +6,10 @@ import {
   UpdateDateColumn,
   Index,
   BaseEntity,
+  OneToMany,
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
+import { Clan } from "./clan";
 
 @ObjectType()
 @Entity("Users")
@@ -28,16 +30,29 @@ export class User extends BaseEntity {
   passwordChangedAt: Date;
 
   @Field()
-  @CreateDateColumn({ name: "created_at" })
+  @CreateDateColumn()
   createdAt: Date;
 
   @Field()
-  @UpdateDateColumn({ name: "updated_at" })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  // constructor({ username, password }: { username: string; password: string }) {
-  //   super();
-  //   this.username = username;
-  //   this.password = password;
-  // }
+  @OneToMany(() => Clan, (clan) => clan.user)
+  clans: Clan[];
+
+  constructor(values?: UserCreateInfo) {
+    super();
+    if (values?.username) {
+      this.username = values.username;
+    }
+
+    if (values?.password) {
+      this.password = values.password;
+    }
+  }
+}
+
+interface UserCreateInfo {
+  username: string;
+  password: string;
 }
