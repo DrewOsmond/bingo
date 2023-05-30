@@ -23,7 +23,6 @@ export class Clan extends BaseEntity {
   @Column()
   name: string;
 
-  @Field()
   @ManyToOne(() => User, (user) => user.clans)
   user: string;
 

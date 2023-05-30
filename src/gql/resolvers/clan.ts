@@ -44,7 +44,7 @@ export default class ClanResolver {
     const clans = await db.clans.findBy({
       user: {
         //@ts-ignore adding ignore here - this works fully, not sure where the typing is wrong.
-        id: ctx.user!.id,
+        id: ctx.user.id,
       },
     });
 
