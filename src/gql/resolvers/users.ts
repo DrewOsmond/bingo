@@ -14,10 +14,11 @@ import { db } from "../../db";
 import { Context } from "../../types";
 import { signJwt } from "../../util/auth/token";
 import { authorize } from "../../util/auth/authenticate";
+import { GQLError } from "../objects";
 @ObjectType()
 class UserResponse {
   @Field(() => String, { nullable: true })
-  error?: string;
+  error: GQLError;
 
   @Field(() => User, { nullable: true })
   user?: User;

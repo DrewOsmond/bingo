@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
 import { Clan } from "./clan";
+import { Length } from "class-validator";
 
 @ObjectType()
 @Entity("Users")
@@ -21,9 +22,15 @@ export class User extends BaseEntity {
 
   @Field()
   @Column({ unique: true })
+  @Length(4, 12, {
+    message: "Username must be between 4 and 12 characters",
+  })
   username: string;
 
   @Column()
+  @Length(8, 32, {
+    message: "Password must be longer than 8 characters",
+  })
   password: string;
 
   @Column({ nullable: true, default: null })
