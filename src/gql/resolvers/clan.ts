@@ -41,9 +41,11 @@ export default class ClanResolver {
   @UseMiddleware(authorize)
   @Query(() => [Clan])
   async clans(@Ctx() ctx: Context) {
+    if (!ctx.user) {
+      return null;
+    }
     const clans = await db.clans.findBy({
       user: {
-        //@ts-ignore adding ignore here - this works fully, not sure where the typing is wrong.
         id: ctx.user.id,
       },
     });

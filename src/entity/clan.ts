@@ -7,9 +7,11 @@ import {
   Index,
   BaseEntity,
   ManyToOne,
+  OneToMany,
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
 import { User } from "./user";
+import { ClanMember } from "./clanMembers";
 
 @ObjectType()
 @Entity("Clans")
@@ -23,8 +25,15 @@ export class Clan extends BaseEntity {
   @Column()
   name: string;
 
+  @Field()
+  @Column({ default: () => "true" })
+  public: boolean;
+
   @ManyToOne(() => User, (user) => user.clans)
-  user: string;
+  user: User;
+
+  @OneToMany(() => ClanMember, (member) => member.clan)
+  clanMember: ClanMember[];
 
   @Field()
   @CreateDateColumn()
@@ -40,7 +49,7 @@ export class Clan extends BaseEntity {
       this.name = values.name;
     }
     if (values?.user) {
-      this.user = values.user.id;
+      this.user = values.user;
     }
   }
 }

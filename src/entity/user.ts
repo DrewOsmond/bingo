@@ -11,6 +11,7 @@ import {
 import { Field, ObjectType } from "type-graphql";
 import { Clan } from "./clan";
 import { Length } from "class-validator";
+import { ClanMember } from "./clanMembers";
 
 @ObjectType()
 @Entity("Users")
@@ -44,16 +45,23 @@ export class User extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Field(() => [Clan])
   @OneToMany(() => Clan, (clan) => clan.user)
   clans: Clan[];
 
-  constructor(values?: UserCreateInfo) {
+  @Field(() => [ClanMember])
+  @OneToMany(() => ClanMember, (clanMember) => clanMember.user)
+  clanMembers: ClanMember[];
+
+  constructor(values: UserCreateInfo | undefined) {
     super();
-    if (values?.username) {
+    if (!values) return;
+
+    if (values.username) {
       this.username = values.username;
     }
 
-    if (values?.password) {
+    if (values.password) {
       this.password = values.password;
     }
   }

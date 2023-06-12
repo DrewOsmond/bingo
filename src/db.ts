@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import { User } from "./entity/user";
 import { Clan } from "./entity/clan";
+import { ClanMember } from "./entity/clanMembers";
 
 const dbport = process.env.DBPORT;
 const username = process.env.DBUSERNAME;
@@ -19,7 +20,7 @@ export const appDataSource = new DataSource({
   type: "postgres",
   host: "localhost",
   logging: false,
-  entities: [User, Clan],
+  entities: [User, Clan, ClanMember],
   migrations: ["src/migration/**/*.ts"],
   subscribers: [],
   synchronize: true,
@@ -37,4 +38,5 @@ appDataSource
 export const db = {
   users: appDataSource.getRepository(User),
   clans: appDataSource.getRepository(Clan),
+  clanMembmers: appDataSource.getRepository(ClanMember),
 };
